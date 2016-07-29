@@ -144,10 +144,11 @@ int main(int argc, char *argv[])
     int sfd_1 = init_serial((char *)MODEMDEVICE_1, &oldtio_1);
 
     while (1) {
-        printf("Waiting for connection...\n");
+        printf("Waiting for new connection...\n");
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0) error("ERROR on accept");
         printf("Connected in socket(%d)\n", newsockfd);
+        STOP = FALSE;
 
         /*
           send commands to arduinoes for rotating cube
@@ -241,6 +242,7 @@ int main(int argc, char *argv[])
             }
         }
         close(newsockfd);
+        printf("Socket(%d) is closed\n");
     }
     
     /* restore the old port settings */
