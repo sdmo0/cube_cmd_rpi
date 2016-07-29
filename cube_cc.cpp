@@ -135,109 +135,112 @@ int main(int argc, char *argv[])
              sizeof(serv_addr)) < 0) 
         error("ERROR on binding");
      
-    listen(sockfd, 5);
+    listen(sockfd, 1);
     clilen = sizeof(cli_addr);
 
     struct termios oldtio_0;
     struct termios oldtio_1;
     int sfd_0 = init_serial((char *)MODEMDEVICE_0, &oldtio_0);
     int sfd_1 = init_serial((char *)MODEMDEVICE_1, &oldtio_1);
-     
-    newsockfd = accept(sockfd, 
-                       (struct sockaddr *) &cli_addr, 
-                       &clilen);
-    if (newsockfd < 0) 
-        error("ERROR on accept");
 
-    /*
-      send commands to arduinoes for rotating cube
-      needs to send both of arduinoes
-    */
-     
-    while (STOP == FALSE) {
-        bzero(buffer, 256);
-        n = read(newsockfd, buffer, 255);
-        if (n < 0) error("ERROR reading from socket");
+    while (1) {
+        printf("Waiting for connection...\n");
+        newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+        if (newsockfd < 0) error("ERROR on accept");
+        printf("Connected in socket(%d)\n", newsockfd);
 
-        char tbuf[256];
-        string cmd_str(buffer);
-        string str_0 = "";
-        string str_1 = "";
-        cout << "Cube command: " << cmd_str << endl;
-        for (unsigned int i = 0; i < cmd_str.length(); i++) {
-            if (cmd_str[i] == 'R') {
-                if (cmd_str[i+1] == '\'') {
-                    str_0 += "r";
+        /*
+          send commands to arduinoes for rotating cube
+          needs to send both of arduinoes
+        */
+     
+        while (STOP == FALSE) {
+            bzero(buffer, 256);
+            n = read(newsockfd, buffer, 255);
+            if (n < 0) error("ERROR reading from socket");
+            else if (n == 0) STOP = TRUE;
+
+            char tbuf[256];
+            string cmd_str(buffer);
+            string str_0 = "";
+            string str_1 = "";
+            cout << "Cube command: " << cmd_str << endl;
+            for (unsigned int i = 0; i < cmd_str.length(); i++) {
+                if (cmd_str[i] == 'R') {
+                    if (cmd_str[i+1] == '\'') {
+                        str_0 += "r";
+                    }
+                    else {
+                        str_0 += "R";
+                    }
                 }
-                else {
-                    str_0 += "R";
+                else if (cmd_str[i] == 'F') {
+                    if (cmd_str[i+1] == '\'') {
+                        str_0 += "f";
+                    }
+                    else
+                        str_0 +="F" ;
                 }
-            }
-            else if (cmd_str[i] == 'F') {
-                if (cmd_str[i+1] == '\'') {
-                    str_0 += "f";
+                else if (cmd_str[i] == 'U') {
+                    if (cmd_str[i+1] == '\'') {
+                        cmd_str[i] = 'u';
+                        str_0 += cmd_str[i];
+                    }
+                    else
+                        str_0 += cmd_str[i];
                 }
-                else
-                    str_0 +="F" ;
-            }
-            else if (cmd_str[i] == 'U') {
-                if (cmd_str[i+1] == '\'') {
-                    cmd_str[i] = 'u';
-                    str_0 += cmd_str[i];
-                }
-                else
-                    str_0 += cmd_str[i];
-            }
     
 
-            if (str_0.length() > 0) {
-                //cout << str_0 << endl;
-                int n = write(sfd_0, str_0.c_str(), str_0.length());
-                if (n < 0) error("ERROR writing to arduino #1");
-                str_0 = "";
-                while (tbuf[0] != '1') {
-                    read(sfd_0, tbuf, 1);
-                    printf("from Arduino_1: %c\n", tbuf[0]);
+                if (str_0.length() > 0) {
+                    //cout << str_0 << endl;
+                    int n = write(sfd_0, str_0.c_str(), str_0.length());
+                    if (n < 0) error("ERROR writing to arduino #1");
+                    str_0 = "";
+                    while (tbuf[0] != '1') {
+                        read(sfd_0, tbuf, 1);
+                        printf("from Arduino_1: %c\n", tbuf[0]);
+                    }
+                    bzero(tbuf, 256);
                 }
-                bzero(tbuf, 256);
-            }
 
-            if (cmd_str[i] == 'B') {
-                if (cmd_str[i+1] == '\'') {
-                    str_1 += "b";
+                if (cmd_str[i] == 'B') {
+                    if (cmd_str[i+1] == '\'') {
+                        str_1 += "b";
+                    }
+                    else
+                        str_1 += "B";
                 }
-                else
-                    str_1 += "B";
-            }
       
-            if (cmd_str[i] == 'D') {
-                if (cmd_str[i+1] == '\'') {
-                    str_1 += "d";
+                if (cmd_str[i] == 'D') {
+                    if (cmd_str[i+1] == '\'') {
+                        str_1 += "d";
+                    }
+                    else
+                        str_1 += "D";
                 }
-                else
-                    str_1 += "D";
-            }
 
-            if (cmd_str[i] == 'L') {
-                if (cmd_str[i+1] == '\'') {
-                    str_1 += "l";
+                if (cmd_str[i] == 'L') {
+                    if (cmd_str[i+1] == '\'') {
+                        str_1 += "l";
+                    }
+                    else
+                        str_1 += "L";
                 }
-                else
-                    str_1 += "L";
-            }
      
-            if (str_1.length() > 0) {
-                //cout << str_1 << endl;
-                int n = write(sfd_1, str_1.c_str(), str_1.length());
-                if (n < 0) error("ERROR writing to arduino #2");
-                str_1 = "";
-                while (tbuf[0] != '2') {
-                    read(sfd_1, tbuf, 1);
-                    printf("from Arduino_2: %c\n", tbuf[0]);
+                if (str_1.length() > 0) {
+                    //cout << str_1 << endl;
+                    int n = write(sfd_1, str_1.c_str(), str_1.length());
+                    if (n < 0) error("ERROR writing to arduino #2");
+                    str_1 = "";
+                    while (tbuf[0] != '2') {
+                        read(sfd_1, tbuf, 1);
+                        printf("from Arduino_2: %c\n", tbuf[0]);
+                    }
+                    bzero(tbuf, 256);
                 }
-                bzero(tbuf, 256);
             }
         }
+        close(newsockfd);
     }
     
     /* restore the old port settings */
