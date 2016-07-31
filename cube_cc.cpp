@@ -201,6 +201,8 @@ int main(int argc, char *argv[])
                         read(sfd_0, tbuf, 1);
                         printf("from Arduino_1: %c\n", tbuf[0]);
                     }
+                    printf("Press any key to continue...\n");
+                    getchar();
                     bzero(tbuf, 256);
                 }
 
@@ -237,12 +239,15 @@ int main(int argc, char *argv[])
                         read(sfd_1, tbuf, 1);
                         printf("from Arduino_2: %c\n", tbuf[0]);
                     }
+                    printf("Press any key to continue...\n");
+                    getchar();
+
                     bzero(tbuf, 256);
                 }
             }
         }
         close(newsockfd);
-        printf("Socket(%d) is closed\n");
+        printf("Socket(%d) was closed\n", newsockfd);
     }
     
     /* restore the old port settings */
