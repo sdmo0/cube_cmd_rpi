@@ -185,10 +185,10 @@ int main(int argc, char *argv[])
                 else if (cmd_str[i] == 'U') {
                     if (cmd_str[i+1] == '\'') {
                         cmd_str[i] = 'u';
-                        str_0 += cmd_str[i];
+                        str_0 += "u";
                     }
                     else
-                        str_0 += cmd_str[i];
+                        str_0 += "U";
                 }
     
 
@@ -196,14 +196,14 @@ int main(int argc, char *argv[])
                     //cout << str_0 << endl;
                     int n = write(sfd_0, str_0.c_str(), str_0.length());
                     if (n < 0) error("ERROR writing to arduino #1");
-                    str_0 = "";
-                    while (tbuf[0] != '1') {
+                    while (tbuf[0] != str_0[0]) {
                         read(sfd_0, tbuf, 1);
                         printf("from Arduino_1: %c\n", tbuf[0]);
                     }
-                    printf("Press any key to continue...\n");
+                    printf("Press Enter key to continue...");
                     getchar();
                     bzero(tbuf, 256);
+                    str_0 = "";
                 }
 
                 if (cmd_str[i] == 'B') {
@@ -234,14 +234,13 @@ int main(int argc, char *argv[])
                     //cout << str_1 << endl;
                     int n = write(sfd_1, str_1.c_str(), str_1.length());
                     if (n < 0) error("ERROR writing to arduino #2");
-                    str_1 = "";
-                    while (tbuf[0] != '2') {
+                    while (tbuf[0] != str_1[0]) {
                         read(sfd_1, tbuf, 1);
-                        printf("from Arduino_2: %c\n", tbuf[0]);
+                        printf("from Arduino_2: %c\n",tbuf[0]);
                     }
-                    printf("Press any key to continue...\n");
+                    printf("Press Enter key to continue...");
                     getchar();
-
+                    str_1 = "";
                     bzero(tbuf, 256);
                 }
             }
