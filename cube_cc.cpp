@@ -200,8 +200,10 @@ int main(int argc, char *argv[])
                         read(sfd_0, tbuf, 1);
                         printf("from Arduino_1: %c\n", tbuf[0]);
                     }
+                    /*
                     printf("Press Enter key to continue...");
                     getchar();
+                    */
                     bzero(tbuf, 256);
                     str_0 = "";
                 }
@@ -238,8 +240,10 @@ int main(int argc, char *argv[])
                         read(sfd_1, tbuf, 1);
                         printf("from Arduino_2: %c\n",tbuf[0]);
                     }
+                    /*
                     printf("Press Enter key to continue...");
                     getchar();
+                    */
                     str_1 = "";
                     bzero(tbuf, 256);
                 }
